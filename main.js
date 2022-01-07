@@ -15,6 +15,7 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 camera.position.setZ(30);
+camera.position.setX(-3);
 
 renderer.render(scene, camera);
 
@@ -37,10 +38,10 @@ const ambientLight = new THREE.AmbientLight(0xffffff);
 scene.add(pointLight, ambientLight);
 
 // helpers
-// const lightHelper = new THREE.PointLightHelper(pointLight);
-// const gridHelper = new THREE.GridHelper(200, 50);
-// scene.add(lightHelper, gridHelper);
-// const controls = new OrbitControls(camera, renderer.domElement);
+const lightHelper = new THREE.PointLightHelper(pointLight);
+const gridHelper = new THREE.GridHelper(200, 50);
+scene.add(lightHelper, gridHelper);
+const controls = new OrbitControls(camera, renderer.domElement);
 
 function addStar() {
     const geometry = new THREE.SphereGeometry(0.25, 24, 24);
@@ -73,23 +74,31 @@ scene.add(coffee);
 // moon
 
 const moonTexture = new THREE.TextureLoader().load('moon-texture.jpg');
-
+const normalTexture = new THREE.TextureLoader().load('normal.jpg');
 const moon = new THREE.Mesh(
     new THREE.SphereGeometry(3, 32, 32),
-    new THREE.MeshStandardMaterial({ map: moonTexture })
+    new THREE.MeshStandardMaterial({
+        map: moonTexture,
+        normalMap: normalTexture,
+    })
 );
+
+
+scene.add(moon);
 
 moon.position.z = 30;
 moon.position.setX(-10);
 
-scene.add(moon);
+coffee.position.z = -5;
+coffee.position.x = 2;
 
+// scroll animation
 
 function moveCamera() {
     const t = document.body.getBoundingClientRect().top;
     moon.rotation.x += 0.5;
-    moon.rotation.y += 0.75;
-    moon.rotation.z += 0.5;
+    moon.rotation.y += 0.075;
+    moon.rotation.z += 0.05;
 
     coffee.rotation.y += 0.01;
     coffee.rotation.z += 0.01;
@@ -100,6 +109,9 @@ function moveCamera() {
 }
 
 document.body.onscroll = moveCamera;
+moveCamera();
+
+// animation loop
 
 function animate() {
     requestAnimationFrame(animate);
@@ -107,6 +119,8 @@ function animate() {
     torus.rotation.x += 0.01;
     torus.rotation.y += 0.005;
     torus.rotation.z += 0.01;
+
+    moon.rotation.x += 0.005;
 
     // controls.update();
     renderer.render(scene, camera);
